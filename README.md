@@ -18,4 +18,8 @@ labels (reviewId, label)
 reviews (reviewId, title, artist, url, score, best_new_music, author, author_type, pub_date, pub_weekday, pub_day, pub_month, pub_year)
 years (reviewId, year)
 
+Πήραμε λοιπόν αυτά τα δεδομένα και με κάποιες τροποποιήσεις (SQL2CSV.ipynb στο repository) φτιάξαμε ένα ενιαίο αρχείο csv που περιέχει όλα τα δεδομένα που θέλουμε να χρησιμοποιήσουμε.
 
+Το τελικό αρχείο που φτιάξαμε και από το οποίο θα αντλούμε κάθε πληροφορία έχει ως fields τα εξής:
+
+reviews(reviewId, content, title, artist, url, score, best_new_music, author, author_type, pub_date, pub_weekday, pub_day, pub_month, pub_year, label)
