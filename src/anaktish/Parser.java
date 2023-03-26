@@ -14,12 +14,13 @@ public class Parser {
 	private Path file;
 	
 	
-	public Parser(String systemPath) {
+	public Parser(String systemPath) throws Exception {
 		
 		this.file = Paths.get(systemPath);
 		
-		
 		this.columns = new ArrayList<String[]>();
+		
+		this.parse();
 	}
 
 	public void parse() throws Exception {
@@ -30,16 +31,17 @@ public class Parser {
 			String header = br.readLine();
 			String line = br.readLine();
 
-//			if(lineNum == 1)
-//				line = br.readLine();
 			
 			while (line != null) {
 			
 				String[] columns = line.split("~");
 				if(columns.length != 15) {
-					System.out.println(lineNum + " " + line);
+//					System.out.println(lineNum + " " + line);
+//					System.out.println(columns.length);
+					line = br.readLine();
+					continue;
 				}
-				System.out.println(columns.length);
+				
 				this.columns.add(columns);
 				lineNum+=1;
 				
