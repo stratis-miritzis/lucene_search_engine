@@ -46,8 +46,31 @@ years (reviewId, year)
     private String pub_year;
     private String label;
 
-Το τελικό αρχείο που φτιάξαμε και από το οποίο θα αντλούμε κάθε πληροφορία έχει ως fields τα εξής:
 
-reviews(reviewId, content, title, artist, url, score, best_new_music, author, author_type, pub_date, pub_weekday, pub_day, pub_month, pub_year, label)
 
+review_id string
+content textField 
+title text 
+artist text
+url string
+score SortedDocValuesField
+best_new_music SortedDocValuesField 
+author stringField
+pub_date TextField
+pub* SortedDocValuesField
+label String
+
+Θα υλοποιήσουμε ένα search engine το οποίο θα κάνει search με βάση το review id, λέξεις μέσα στο review, τίτλους, author και label. Θα υπάρχει επίσης επιλογή να:
+
+-γίνει αναζήτηση μόνο σε μια στήλη, ώστε να επιστρέψει εγκυρότερα αποτελέσματα, όπως και επιλογή του 
+-γίνουν τα αποτελέσματα sorted σύμφωνα με τα score, best_new_music, dates
+-επιστρέφονται τα αποτελέσματα σε 10άδες με την επιλογή εμφάνισης των επόμενων 10 αποτελεσμάτων
+-γίνεται stemming στο title, artist, author, label
+-γίνει απαλοιφή των stopwords στο review (content)
+
+Υπάρχει περίπτωση να συμπεριλάβουμε την λειτουργία διόρθωσης τυπογραφικών λαθών, όπως και η επέκταση ακρωνύμων.
+
+Θα υπάρχει επίσης ιστορικό αναζητήσεων. 
+
+Στόχος είναι το σύστημά μας να παρουσιάζει τα αποτελέσματα σε διάταξη με βάση τη συνάφειά τους με το ερώτημα.
 
