@@ -23,8 +23,31 @@ reviews (reviewId, title, artist, url, score, best_new_music, author, author_typ
 
 years (reviewId, year)
 
+Σκοπός μας είναι να δημιουργείται ένα index απο music reviews τα οποία πήραμε από το pitchfork.
+
 Πήραμε λοιπόν αυτά τα δεδομένα και με κάποιες τροποποιήσεις (SQL2CSV.ipynb στο repository) φτιάξαμε ένα ενιαίο αρχείο csv που περιέχει όλα τα δεδομένα που θέλουμε να χρησιμοποιήσουμε.
+
+Οι τροποποιήσεις που κάνουμε είναι οι εξής:
+
+Ενώνουμε τα tables της βάσης σε ένα μεγάλο table. Αφαιρούμε από τα reviews τα whitespace characters όπως αλλαγή γραμμής κλπ. αφαιρούμε από όλα τα πεδία του table το σύμβολο ~ για να μπορέσει να χρησιμοποιηθεί σαν separator στο csv. Έπειτα, από την java χρησιμοποιώντας την κλάση parser, ανοίγουμε το csv και στην συνέχεια δημιουργούμε αντικείμενα MusicReview, τα οποία έχουν τα ακόλουθα πεδία:
+
+    private String review_id;
+    private String content;
+    private String title;
+    private String artist;
+    private String url;
+    private String score;
+    private String best_new_music;
+    private String author;
+    private String author_type;
+    private String pub_date;
+    private String pub_day;
+    private String pub_month;
+    private String pub_year;
+    private String label;
 
 Το τελικό αρχείο που φτιάξαμε και από το οποίο θα αντλούμε κάθε πληροφορία έχει ως fields τα εξής:
 
 reviews(reviewId, content, title, artist, url, score, best_new_music, author, author_type, pub_date, pub_weekday, pub_day, pub_month, pub_year, label)
+
+
