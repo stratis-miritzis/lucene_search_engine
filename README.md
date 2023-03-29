@@ -57,7 +57,9 @@ score SortedDocValuesField
 best_new_music SortedDocValuesField 
 author stringField
 pub_date TextField
-pub* SortedDocValuesField
+pub_day SortedDocValuesField
+pub_month SortedDocValuesField
+pub_year SortedDocValuesField
 label String
 
 Θα υλοποιήσουμε ένα search engine το οποίο θα κάνει search με βάση το review id, λέξεις μέσα στο review, τίτλους, author και label. Θα υπάρχει επίσης επιλογή να:
