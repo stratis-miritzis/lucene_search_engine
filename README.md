@@ -1,4 +1,4 @@
-### [anaktisi](https://github.com/stratis-miritzis/anaktisi)
+### https://github.com/stratis-miritzis/anaktisi
 
 #### Μυριτζής Ευστράτιος ΑΜ:4444
 #### Δημήτριος Γιαννακόπουλος ΑΜ:4336
