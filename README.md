@@ -83,7 +83,7 @@ years (reviewId, year)
     pub_year SortedDocValuesField
     label String
     
-    ![image](https://user-images.githubusercontent.com/21036454/230148588-e521c424-7ed5-4452-8b74-6556132270e2.png)
+![image](https://user-images.githubusercontent.com/21036454/230148588-e521c424-7ed5-4452-8b74-6556132270e2.png)
 
 
 Και η δυνατότητα αναζήτησης θα δίνεται στα πεδία:
