@@ -48,31 +48,17 @@ years (reviewId, year)
 
 
 
-review_id string
-content textField 
-title text 
-artist text
-url string
-score SortedDocValuesField
-best_new_music SortedDocValuesField 
-author stringField
-pub_date TextField
-pub_day SortedDocValuesField
-pub_month SortedDocValuesField
-pub_year SortedDocValuesField
-label String
+Θα υλοποιήσουμε ένα search engine το οποίο θα κάνει search με βάση το review id , λέξεις μέσα στο review (content), τίτλους, author και label. Η επιλογή θα γίνεται από ένα drop down menu όπου θα επιλέγεται τι κρητίριο αναζήτησης.
 
-Θα υλοποιήσουμε ένα search engine το οποίο θα κάνει search με βάση το review id, λέξεις μέσα στο review, τίτλους, author και label. Θα υπάρχει επίσης επιλογή να:
+Θα υπάρχει επίσης επιλογή να:
 
--γίνει αναζήτηση μόνο σε μια στήλη, ώστε να επιστρέψει εγκυρότερα αποτελέσματα, όπως και επιλογή του 
-
--γίνουν τα αποτελέσματα sorted σύμφωνα με τα score, best_new_music, dates
+-γίνουν τα αποτελέσματα sorted-ομαδοποιημένα σύμφωνα με τα score, best_new_music, dates
 
 -επιστρέφονται τα αποτελέσματα σε 10άδες με την επιλογή εμφάνισης των επόμενων 10 αποτελεσμάτων
 
 -γίνεται stemming στο title, artist, author, label
 
--γίνει απαλοιφή των stopwords στο review (content)
+-γίνει απαλοιφή των stopwords στο review (content) *
 
 Υπάρχει περίπτωση να συμπεριλάβουμε την λειτουργία διόρθωσης τυπογραφικών λαθών, όπως και η επέκταση ακρωνύμων.
 
@@ -80,3 +66,38 @@ label String
 
 Στόχος είναι το σύστημά μας να παρουσιάζει τα αποτελέσματα σε διάταξη με βάση τη συνάφειά τους με το ερώτημα.
 
+Για την δημιουργία του ευρετηρίου στην Lucene θα φτιάχνουμε documents με τα παρακάτω πεδία(fields), αντίστοιχου τύπου :
+
+
+    review_id string
+    content textField 
+    title text 
+    artist text
+    url string
+    score SortedDocValuesField
+    best_new_music SortedDocValuesField 
+    author stringField
+    pub_date TextField
+    pub_day SortedDocValuesField
+    pub_month SortedDocValuesField
+    pub_year SortedDocValuesField
+    label String
+    
+    ![image](https://user-images.githubusercontent.com/21036454/230148588-e521c424-7ed5-4452-8b74-6556132270e2.png)
+
+
+Και η δυνατότητα αναζήτησης θα δίνεται στα πεδία:
+
+    review id , λέξεις μέσα στο review (content), τίτλους, author και label
+
+Με τα ακόλουθα φίλτρα:
+
+    score, best_new_music, date
+    
+Για το gui του προγράμματος θα χρησιμοποιηθεί η βιβλιοθήκη windowBuilder. 
+
+![image](https://user-images.githubusercontent.com/21036454/230150422-0180bddc-f9ed-4055-ad8d-8707fa5ed529.png)
+
+
+
+* Μπορεί και να μην γίνει.
