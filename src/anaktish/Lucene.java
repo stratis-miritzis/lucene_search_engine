@@ -1,6 +1,8 @@
 package anaktish;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -19,6 +21,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.SortedDocValuesField;
@@ -54,17 +57,16 @@ public class Lucene {
 
 		createDocument();
 		
-		for (MusicReview review : MusicReview){ 
+		for (MusicReview review : MusicReview){
 			addDoc(w, review);
 		}
 		w.close();
-
      
 	}
 	
 	private static void addDoc(IndexWriter w, MusicReview music) throws IOException {
 		  Document doc = new Document();
-		  doc.add(new StringField("review_id", music.getReview_id(), Field.Store.YES));
+		  doc.add(new StringField("review_id", music.getReview_id(), Field.Store.YES,Field.Index.ANALYZED));
 		  doc.add(new TextField("content", music.getContent(), Field.Store.YES));
 		  doc.add(new TextField("title", music.getTitle(), Field.Store.YES));
 		  doc.add(new TextField("artist", music.getArtist(), Field.Store.YES));
@@ -90,7 +92,10 @@ public class Lucene {
 	        analyzer = new StandardAnalyzer();
 
 	        // 1. create the index
-	        index = new ByteBuffersDirectory();
+	        Path indexPath = Files.createTempDirectory("/tmp/testindex");
+	        index = FSDirectory.open(indexPath);
+	        
+//	        index = new ByteBuffersDirectory();
 
 	        config = new IndexWriterConfig(analyzer);
 
