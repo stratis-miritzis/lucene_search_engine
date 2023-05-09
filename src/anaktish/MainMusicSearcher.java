@@ -3,10 +3,12 @@ package anaktish;
 import java.awt.EventQueue;
 import org.apache.lucene.search.BooleanClause;
 import java.util.ArrayList;
-
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -32,6 +34,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTabbedPane;
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -61,6 +64,8 @@ import org.apache.lucene.search.ScoreDoc;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import java.awt.Font;
 import javax.swing.JCheckBox;
 import java.awt.event.KeyAdapter;
@@ -77,7 +82,7 @@ public class MainMusicSearcher {
 	private static Lucene lucene;
 	private static Directory index;
 	private static StandardAnalyzer analyzer;
-	private int result_counter = 0;
+	private int[] result_counter = new int[2];
 	private JButton btnNextPage;
 	private JButton btnPrevPage;
 	private ScoreDoc[] hits;
@@ -88,6 +93,18 @@ public class MainMusicSearcher {
 	private TopDocs docs;
 	private JCheckBox chckbxBestNewMusic;
 	private JLabel lblNewLabel;
+	private static final String COMMIT_ACTION = "commit";
+	private static List<String> keywords = new ArrayList<String>();
+	private JLabel lblPage;
+	private static JScrollPane scrollList;
+	private JList list;
+	private JScrollPane scrollPane;
+	private JList list_1;
+	private JList list_2;
+	private DefaultListModel historyList;
+	private History history;
+	private JLabel lblMyritzisEfstratios;
+	
 
 	/**
 	 * Launch the application.
@@ -96,6 +113,8 @@ public class MainMusicSearcher {
 	private static ArrayList<MusicReview> convert(ArrayList<String[]> columns){
 		ArrayList<MusicReview> returnMusic;
 		returnMusic = new ArrayList<MusicReview>();
+		
+
 		
 		for (String[] reviewData : columns){
 			MusicReview musicReview = new MusicReview(reviewData);
@@ -110,7 +129,33 @@ public class MainMusicSearcher {
 		ArrayList<String[]> musicColumns = parser.getColumns();
 		ArrayList<MusicReview> MusicReview = convert(musicColumns);
 		
-
+//		for (MusicReview review : MusicReview) {
+//			String[] splitTitle = review.getTitle().split(" ");
+//			for (int i = 0; i < splitTitle.length - 2;i += 2) {
+//				
+//				StringBuilder sb = new StringBuilder();
+//				sb.append(splitTitle[i]);
+//				sb.append(" ");
+//				sb.append(splitTitle[i+1]);
+//				
+//				String text = sb.toString();
+//				keywords.add(text);
+//			}
+//			
+//			String[] splitArtist = review.getArtist().split(" ");
+//			for (int i = 0; i < splitArtist.length - 2;i += 2) {
+//				
+//				StringBuilder sb = new StringBuilder();
+//				sb.append(splitArtist[i]);
+//				sb.append(" ");
+//				sb.append(splitArtist[i+1]);
+//				
+//				String text = sb.toString();
+//				keywords.add(text);
+//			}
+//			
+//		}
+		
 		lucene = new Lucene(MusicReview);
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -122,13 +167,9 @@ public class MainMusicSearcher {
 					e.printStackTrace();
 				}
 			}
-		});
-		
-        // 3. search        
-        
+		});        
         analyzer = lucene.getAnalyzer();
 
-        // 1. create the index
         index = lucene.getIndex();
 		
 	}
@@ -154,7 +195,7 @@ public class MainMusicSearcher {
 		txtSearch = new JTextField();
 
 		txtSearch.setText("Search");
-		txtSearch.setBounds(12, 12, 1074, 25);
+		txtSearch.setBounds(12, 12, 668, 25);
 		frame.getContentPane().add(txtSearch);
 		txtSearch.setColumns(10);
 		
@@ -162,13 +203,13 @@ public class MainMusicSearcher {
 		
 		frame.getRootPane().setDefaultButton(btnNewButton);
 		
-
+		
 
 		btnNewButton.setBounds(1226, 12, 117, 25);
 		frame.getContentPane().add(btnNewButton);
 		
 		panel = new JPanel();
-		panel.setBounds(12, 129, 1331, 542);
+		panel.setBounds(12, 176, 1331, 495);
 		frame.getContentPane().add(panel);
 		panel.setLayout(null);
 		
@@ -178,7 +219,7 @@ public class MainMusicSearcher {
 
 		
 		
-		table.setBounds(0, 24, 1307, 518);
+		table.setBounds(12, 12, 1307, 452);
 		panel.add(table);		
 		
 		table.setModel(new DefaultTableModel(
@@ -190,17 +231,21 @@ public class MainMusicSearcher {
 			}
 		));
 		
+		lblMyritzisEfstratios = new JLabel("Myritzis Efstratios 4444 __ Dimitrios Giannakopoulos 4336");
+		lblMyritzisEfstratios.setBounds(901, 468, 430, 41);
+		panel.add(lblMyritzisEfstratios);
+		
 		btnNextPage = new JButton("next page");
-		btnNextPage.setBounds(1226, 99, 105, 25);
+		btnNextPage.setBounds(1226, 139, 105, 25);
 		frame.getContentPane().add(btnNextPage);
 		
 		btnPrevPage = new JButton("prev page");
 
-		btnPrevPage.setBounds(1114, 99, 105, 25);
+		btnPrevPage.setBounds(1110, 139, 105, 25);
 		frame.getContentPane().add(btnPrevPage);
 			
 		
-    	btnPrevPage.setEnabled(true);
+    	btnPrevPage.setEnabled(false);
     	btnNextPage.setEnabled(false);
     	
     	String[] optionsToChoose = {"content", "review_id", "title", "artist", "url", "score", "author", "pub_date", "label"};
@@ -209,9 +254,6 @@ public class MainMusicSearcher {
     	comboBox.setBounds(1098, 12, 116, 24);
     	frame.getContentPane().add(comboBox);
     	
-    	JComboBox comboBox_1 = new JComboBox();
-    	comboBox_1.setBounds(1056, 13, 30, 22);
-    	frame.getContentPane().add(comboBox_1);
     	
     	String[] optionsToChoose2 = {"","score","publication date"};
     	comboBox_2 = new JComboBox(optionsToChoose2);
@@ -231,19 +273,60 @@ public class MainMusicSearcher {
     	frame.getContentPane().add(chckbxBestNewMusic);
     	
     	lblNewLabel = new JLabel("New label");
-    	lblNewLabel.setBounds(63, 102, 357, 22);
+    	lblNewLabel.setBounds(58, 142, 357, 22);
     	lblNewLabel.setVisible(false);
     	frame.getContentPane().add(lblNewLabel);
 		
 		//event listeners
-		
-		
-		btnPrevPage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-			}
-		});
+
+    	history = new History(txtSearch, keywords);
+        
+        lblPage = new JLabel("");
+        lblPage.setBounds(1110, 95, 185, 27);
+        frame.getContentPane().add(lblPage);
+        lblPage.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblHistory = new JLabel("History");
+        lblHistory.setFont(new Font("Dialog", Font.BOLD, 16));
+        lblHistory.setBounds(710, 13, 80, 20);
+        frame.getContentPane().add(lblHistory);
+        
+        JButton btnClear = new JButton("Clear");
+
+        btnClear.setBounds(890, 12, 117, 25);
+        frame.getContentPane().add(btnClear);
+        
+        scrollPane = new JScrollPane();
+        scrollPane.setBounds(701, 45, 306, 130);
+        frame.getContentPane().add(scrollPane);
+        
+
+        
+        
+        historyList = new DefaultListModel();
+        
+        list = new JList(historyList);
+ 
+        scrollPane.setViewportView(list);
+        
+        
+        
+        txtSearch.getDocument().addDocumentListener(history);
+        txtSearch.getInputMap().put(KeyStroke.getKeyStroke("TAB"), COMMIT_ACTION);
+        txtSearch.getActionMap().put(COMMIT_ACTION, history.new CommitAction());
+        
+        
+        list.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+		        String selectedWord = (String) list.getSelectedValue();
+		        
+		        
+		        txtSearch.setText(selectedWord);
+
+        	}
+        });
+
 		
 		table.addMouseListener(new MouseAdapter() {
 			  public void mouseClicked(MouseEvent e) {
@@ -279,30 +362,71 @@ public class MainMusicSearcher {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					table.setModel(new DefaultTableModel(
-							new Object[][] {
-								{"review_id", "content", "title", "artist", "url", "score", "author", "pub_date", "label"}
-							},
-							new String[] {
-								"", "", "", "", "", "", "", "", ""
-							}
-					));
-					
-			        for(int i=result_counter;i < result_counter+10;++i) {
-			        	System.out.println(i);
-			        	if (i == hits.length) {
-			        		result_counter = i;
-			        		btnNextPage.setEnabled(false);
-			        		break;
+					if(btnNextPage.isEnabled()) {
+				        result_counter[0] += 10;
+				        result_counter[1] += 10;
+						table.setModel(new DefaultTableModel(
+								new Object[][] {
+									{"review_id", "content", "title", "artist", "url", "score", "author", "pub_date", "label"}
+								},
+								new String[] {
+									"", "", "", "", "", "", "", "", ""
+								}
+						));
+						
+				        for(int i=result_counter[0];i < result_counter[1];++i) {
+				        	if (i >= hits.length) {
+				        		btnNextPage.setEnabled(false);
+				        		break;
+				        	}
+				            int docId = hits[i].doc;
+				            Document d = searcher.doc(docId); 
+				    		DefaultTableModel model = (DefaultTableModel) table.getModel();
+				    		model.addRow(new Object[]{WordColorer(d.get("review_id")),d.get("content"),WordColorer(d.get("title")),WordColorer(d.get("artist")),d.get("url"),WordColorer(d.get("score"))
+				    				,WordColorer(d.get("author")),WordColorer(d.get("pub_date")),WordColorer(d.get("label"))});
+				        }
+				        btnPrevPage.setEnabled(true);
+				        
+				        lblPage.setText("Page " + result_counter[1]/10 + " out of " + (hits.length/10 + 1));
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		btnPrevPage.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					if(btnPrevPage.isEnabled()) {
+				        result_counter[0] -= 10;
+				        result_counter[1] -= 10;
+				        btnNextPage.setEnabled(true);
+			        	if (result_counter[0] == 0) {
+			        		btnPrevPage.setEnabled(false);
 			        	}
-			            int docId = hits[i].doc;
-			            Document d = searcher.doc(docId); 
-			    		DefaultTableModel model = (DefaultTableModel) table.getModel();
-			    		model.addRow(new Object[]{WordColorer(d.get("review_id")),d.get("content"),WordColorer(d.get("title")),WordColorer(d.get("artist")),d.get("url"),WordColorer(d.get("score"))
-			    				,WordColorer(d.get("author")),WordColorer(d.get("pub_date")),WordColorer(d.get("label"))});
-			        }
-			        result_counter += 10;
-					
+						
+						table.setModel(new DefaultTableModel(
+								new Object[][] {
+									{"review_id", "content", "title", "artist", "url", "score", "author", "pub_date", "label"}
+								},
+								new String[] {
+									"", "", "", "", "", "", "", "", ""
+								}
+						));
+						
+				        for(int i=result_counter[0];i < result_counter[1];++i) {
+				            int docId = hits[i].doc;
+				            Document d = searcher.doc(docId); 
+				    		DefaultTableModel model = (DefaultTableModel) table.getModel();
+				    		model.addRow(new Object[]{WordColorer(d.get("review_id")),d.get("content"),WordColorer(d.get("title")),WordColorer(d.get("artist")),d.get("url"),WordColorer(d.get("score"))
+				    				,WordColorer(d.get("author")),WordColorer(d.get("pub_date")),WordColorer(d.get("label"))});
+				        }
+				        
+				        lblPage.setText("Page " + result_counter[1]/10 + " out of " + (hits.length/10 + 1));
+					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -327,7 +451,17 @@ public class MainMusicSearcher {
 			}
 		});
 		
-		
+        btnClear.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+                historyList = new DefaultListModel();
+                
+                list = new JList(historyList);
+                scrollPane.setViewportView(list);
+                
+                history.clearKeywords();
+        	}
+        });
 
 	}
 	
@@ -340,7 +474,8 @@ public class MainMusicSearcher {
 			String searchField = (String) comboBox.getItemAt(comboBox.getSelectedIndex());
 			System.out.println(searchField);
 	        Query q = new QueryParser(searchField, analyzer).parse(txtSearch.getText());
-	        result_counter = 0;
+	        result_counter[0] = 0;
+	        result_counter[1] = 10;
 	        
 	        IndexReader reader = DirectoryReader.open(index);
 	        searcher = new IndexSearcher(reader);
@@ -425,8 +560,9 @@ public class MainMusicSearcher {
 	        lblNewLabel.setVisible(true);
 	        DecimalFormat numberFormat = new DecimalFormat("#.###");
 	        lblNewLabel.setText("About " + hits.length + " results (" + numberFormat.format((endTime - startTime)/1000000000f) + " seconds)");
-	        for(int i=0;i < 10;++i) {
-	        	if (i == hits.length) {
+	        for(int i=result_counter[0];i < result_counter[1];++i) {
+	        	System.out.println(i);
+	        	if (i >= hits.length) {
 	        		btnNextPage.setEnabled(false);
 	        		break;
 	        	}
@@ -438,10 +574,11 @@ public class MainMusicSearcher {
 	    		TableColumn tColumn = table.getColumnModel().getColumn(4);
 	    		tColumn.setCellRenderer(new ColumnColorRenderer(Color.white, Color.blue));
 	        }
-	        result_counter += 10;
+	        lblPage.setText("Page " + result_counter[1]/10 + " out of " + (hits.length/10 + 1));
 			
-			
-			
+			historyList.addElement(txtSearch.getText());
+			history.addKeywords(txtSearch.getText());
+	        
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
