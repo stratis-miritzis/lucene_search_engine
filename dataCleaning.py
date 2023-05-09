@@ -23,8 +23,11 @@ print(final.isnull().sum())
 final['content'] = final['content'].str.replace('\v',' ',regex=True)
 final['content'] = final['content'].str.replace('\\',' ',regex=True)
 final['content'] = final['content'].str.replace("\r",' ',regex=True)
-final['content'] = final['content'].str.replace('\n',' ',regex=True)
 final['content'] = final['content'].str.replace("\n",' ',regex=True)
+final['content'] = final['content'].str.replace("\t",'',regex=True)
+final['content'] = final['content'].str.replace("\"",'',regex=True)
+final['content'] = final['content'].str.replace("      ",'',regex=True)
+
 
 
 
