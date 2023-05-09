@@ -30,10 +30,10 @@ public class MusicReview {
 		this.best_new_music = columns[6];
 		this.author = columns[7];
 		this.pub_date = columns[9];
-		this.pub_day = columns[10];
-		this.pub_month = columns[11];
-		this.pub_year = columns[12];
-		this.label = columns[13];
+		this.pub_day = columns[11];
+		this.pub_month = columns[12];
+		this.pub_year = columns[13];
+		this.label = columns[14];
 	}
 
 

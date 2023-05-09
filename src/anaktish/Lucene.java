@@ -24,6 +24,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FloatDocValuesField;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
 
 
@@ -69,15 +72,18 @@ public class Lucene {
 	
 	private static void addDoc(IndexWriter w, MusicReview music) throws IOException {
 		  Document doc = new Document();
-		  doc.add(new StringField("review_id", music.getReview_id(), Field.Store.YES,Field.Index.ANALYZED));
+		  doc.add(new StringField("review_id", music.getReview_id(), Field.Store.YES));
 		  doc.add(new TextField("content", music.getContent(), Field.Store.YES));
 		  doc.add(new TextField("title", music.getTitle(), Field.Store.YES));
 		  doc.add(new TextField("artist", music.getArtist(), Field.Store.YES));
 		  doc.add(new StringField("url", music.getUrl(), Field.Store.YES));
 		  doc.add(new StringField("score", music.getScore(), Field.Store.YES));
-		  doc.add(new SortedDocValuesField("best_new_music", new BytesRef(music.getBest_new_music())));
-		  doc.add(new StringField("author", music.getAuthor(), Field.Store.YES));
+		  doc.add(new FloatDocValuesField("score_sort", Float.parseFloat(music.getScore())));
+		  doc.add(new TextField("best_new_music", music.getBest_new_music(), Field.Store.YES));
+		  doc.add(new TextField("author", music.getAuthor(), Field.Store.YES));
 		  doc.add(new TextField("pub_date", music.getPub_date(), Field.Store.YES));
+		  int days = Integer.parseInt(music.getPub_day()) + 30 * Integer.parseInt(music.getPub_month()) + 365 * Integer.parseInt(music.getPub_year());
+		  doc.add(new NumericDocValuesField("pub_date_sorted", days));
 		  doc.add(new SortedDocValuesField("pub_day", new BytesRef(music.getPub_day())));
 		  doc.add(new SortedDocValuesField("pub_month", new BytesRef(music.getPub_month())));
 		  doc.add(new SortedDocValuesField("pub_year", new BytesRef(music.getPub_year())));
@@ -95,10 +101,10 @@ public class Lucene {
 	        analyzer = new StandardAnalyzer();
 
 	        // 1. create the index
-	        Path indexPath = Files.createTempDirectory("/tmp/testindex");
-	        index = FSDirectory.open(indexPath);
+//	        Path indexPath = Files.createTempDirectory("tempIndex");
+//	        index = FSDirectory.open(indexPath);
 	        
-//	        index = new ByteBuffersDirectory();
+	        index = new ByteBuffersDirectory();
 
 	        config = new IndexWriterConfig(analyzer);
 
