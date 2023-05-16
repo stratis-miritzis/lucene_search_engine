@@ -70,21 +70,5 @@ public class ContextWindow {
 		
 		
 		
-//        setBounds(100, 100, 491, 310);
-//        getContentPane().setLayout(null);
-//
-//        JTextArea textField = new JTextArea();
-//        textField.setEditable(false);
-//
-//        String str = "";
-//        for (int i = 0; i < 50; ++i)
-//            str += "Some text\n";
-//        textField.setText(str);
-//
-//        JScrollPane scroll = new JScrollPane(textField);
-//        scroll.setBounds(10, 11, 455, 249);                    
-//
-//        getContentPane().add(scroll);
-//        setLocationRelativeTo ( null );
 	}
 }

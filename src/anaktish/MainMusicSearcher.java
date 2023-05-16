@@ -104,7 +104,9 @@ public class MainMusicSearcher {
 	private DefaultListModel historyList;
 	private History history;
 	private JLabel lblMyritzisEfstratios;
-	
+	private Embeddings embeddings;
+	private JCheckBox chckbxSemanticSearch;
+	private TableColumnModel columnModel;
 
 	/**
 	 * Launch the application.
@@ -128,33 +130,7 @@ public class MainMusicSearcher {
 		Parser parser = new Parser("/home/stratis/Desktop/anaktisi/reviews.csv");
 		ArrayList<String[]> musicColumns = parser.getColumns();
 		ArrayList<MusicReview> MusicReview = convert(musicColumns);
-		
-//		for (MusicReview review : MusicReview) {
-//			String[] splitTitle = review.getTitle().split(" ");
-//			for (int i = 0; i < splitTitle.length - 2;i += 2) {
-//				
-//				StringBuilder sb = new StringBuilder();
-//				sb.append(splitTitle[i]);
-//				sb.append(" ");
-//				sb.append(splitTitle[i+1]);
-//				
-//				String text = sb.toString();
-//				keywords.add(text);
-//			}
-//			
-//			String[] splitArtist = review.getArtist().split(" ");
-//			for (int i = 0; i < splitArtist.length - 2;i += 2) {
-//				
-//				StringBuilder sb = new StringBuilder();
-//				sb.append(splitArtist[i]);
-//				sb.append(" ");
-//				sb.append(splitArtist[i+1]);
-//				
-//				String text = sb.toString();
-//				keywords.add(text);
-//			}
-//			
-//		}
+	
 		
 		lucene = new Lucene(MusicReview);
 		
@@ -185,6 +161,9 @@ public class MainMusicSearcher {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		embeddings = new Embeddings();
+		
+		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1366, 720);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -217,19 +196,24 @@ public class MainMusicSearcher {
 		table.setFont(new Font("Dialog", Font.PLAIN, 18));
 		table.setRowHeight(40);
 
-		
-		
+
+	 
 		table.setBounds(12, 12, 1307, 452);
-		panel.add(table);		
 		
 		table.setModel(new DefaultTableModel(
-			new Object[][] {
-				{"review_id", "content", "title", "artist", "url", "author", "pub_date", "label"},
-			},
-			new String[] {
-				"", "", "", "", "", "", "", "", ""
-			}
+				new Object[][] {
+					{"review_id", "content", "title", "artist", "url", "score", "author", "pub_date", "label"}
+				},
+				new String[] {
+					"", "", "", "", "", "", "", "", ""
+				}
 		));
+	    columnModel = table.getColumnModel();
+		columnModel.getColumn(0).setPreferredWidth(5);
+		columnModel.getColumn(2).setPreferredWidth(150);
+		columnModel.getColumn(5).setPreferredWidth(5);
+		
+		panel.add(table);	
 		
 		lblMyritzisEfstratios = new JLabel("Myritzis Efstratios 4444 __ Dimitrios Giannakopoulos 4336");
 		lblMyritzisEfstratios.setBounds(901, 468, 430, 41);
@@ -309,6 +293,10 @@ public class MainMusicSearcher {
  
         scrollPane.setViewportView(list);
         
+        chckbxSemanticSearch = new JCheckBox("Semantic search");
+        chckbxSemanticSearch.setBounds(12, 99, 170, 23);
+        frame.getContentPane().add(chckbxSemanticSearch);
+        
         
         
         txtSearch.getDocument().addDocumentListener(history);
@@ -373,6 +361,9 @@ public class MainMusicSearcher {
 									"", "", "", "", "", "", "", "", ""
 								}
 						));
+						columnModel.getColumn(0).setPreferredWidth(5);
+						columnModel.getColumn(2).setPreferredWidth(150);
+						columnModel.getColumn(5).setPreferredWidth(5);
 						
 				        for(int i=result_counter[0];i < result_counter[1];++i) {
 				        	if (i >= hits.length) {
@@ -384,6 +375,8 @@ public class MainMusicSearcher {
 				    		DefaultTableModel model = (DefaultTableModel) table.getModel();
 				    		model.addRow(new Object[]{WordColorer(d.get("review_id")),d.get("content"),WordColorer(d.get("title")),WordColorer(d.get("artist")),d.get("url"),WordColorer(d.get("score"))
 				    				,WordColorer(d.get("author")),WordColorer(d.get("pub_date")),WordColorer(d.get("label"))});
+				    		TableColumn tColumn = table.getColumnModel().getColumn(4);
+				    		tColumn.setCellRenderer(new ColumnColorRenderer(Color.white, Color.blue));
 				        }
 				        btnPrevPage.setEnabled(true);
 				        
@@ -416,6 +409,9 @@ public class MainMusicSearcher {
 									"", "", "", "", "", "", "", "", ""
 								}
 						));
+						columnModel.getColumn(0).setPreferredWidth(5);
+						columnModel.getColumn(2).setPreferredWidth(150);
+						columnModel.getColumn(5).setPreferredWidth(5);
 						
 				        for(int i=result_counter[0];i < result_counter[1];++i) {
 				            int docId = hits[i].doc;
@@ -423,7 +419,10 @@ public class MainMusicSearcher {
 				    		DefaultTableModel model = (DefaultTableModel) table.getModel();
 				    		model.addRow(new Object[]{WordColorer(d.get("review_id")),d.get("content"),WordColorer(d.get("title")),WordColorer(d.get("artist")),d.get("url"),WordColorer(d.get("score"))
 				    				,WordColorer(d.get("author")),WordColorer(d.get("pub_date")),WordColorer(d.get("label"))});
+				    		TableColumn tColumn = table.getColumnModel().getColumn(4);
+				    		tColumn.setCellRenderer(new ColumnColorRenderer(Color.white, Color.blue));
 				        }
+				        
 				        
 				        lblPage.setText("Page " + result_counter[1]/10 + " out of " + (hits.length/10 + 1));
 					}
@@ -473,7 +472,16 @@ public class MainMusicSearcher {
 		try {
 			String searchField = (String) comboBox.getItemAt(comboBox.getSelectedIndex());
 			System.out.println(searchField);
-	        Query q = new QueryParser(searchField, analyzer).parse(txtSearch.getText());
+			
+			
+        	Query q;
+        	Query query;
+			if(chckbxSemanticSearch.isSelected()) {
+        		q = new QueryParser(searchField, analyzer).parse(txtSearch.getText() + embeddings.apiCall(txtSearch.getText()));
+        	}else {
+        		q = new QueryParser(searchField, analyzer).parse(txtSearch.getText());
+        	}
+//			 + embeddings.apiCall(txtSearch.getText())
 	        result_counter[0] = 0;
 	        result_counter[1] = 10;
 	        
@@ -485,8 +493,15 @@ public class MainMusicSearcher {
 				sort = new Sort(new SortedNumericSortField("score_sort", SortField.Type.FLOAT, !chckbxDescending.isSelected()));
 				
 		        if (chckbxBestNewMusic.isSelected()) {
-		        	Query query = new TermQuery(new Term(searchField, txtSearch.getText()));
-			        Query filter = new TermQuery(new Term("best_new_music", "1"));
+					if(chckbxSemanticSearch.isSelected()) {
+						query = new TermQuery(new Term(searchField, txtSearch.getText() + embeddings.apiCall(txtSearch.getText())));
+		        	}else {
+		        		query = new TermQuery(new Term(searchField, txtSearch.getText()));
+		        	}
+		        	
+		        	
+			        
+		        	Query filter = new TermQuery(new Term("best_new_music", "1"));
 			        
 			        BooleanQuery booleanQuery = new BooleanQuery.Builder()
 			            .add(query, BooleanClause.Occur.MUST)
@@ -506,7 +521,12 @@ public class MainMusicSearcher {
 				
 				
 		        if (chckbxBestNewMusic.isSelected()) {
-		        	Query query = new TermQuery(new Term(searchField, txtSearch.getText()));
+					if(chckbxSemanticSearch.isSelected()) {
+						query = new TermQuery(new Term(searchField, txtSearch.getText() + embeddings.apiCall(txtSearch.getText())));
+		        	}else {
+		        		query = new TermQuery(new Term(searchField, txtSearch.getText()));
+		        	}
+		        	
 			        Query filter = new TermQuery(new Term("best_new_music", "1"));
 			        
 			        BooleanQuery booleanQuery = new BooleanQuery.Builder()
@@ -523,8 +543,12 @@ public class MainMusicSearcher {
 			    
 			  default:
 				if (chckbxBestNewMusic.isSelected()) {
-		        	Query query = new TermQuery(new Term(searchField, txtSearch.getText()));
-			        Query filter = new TermQuery(new Term("best_new_music", "1"));
+					if(chckbxSemanticSearch.isSelected()) {
+						query = new TermQuery(new Term(searchField, txtSearch.getText() + embeddings.apiCall(txtSearch.getText())));
+		        	}else {
+		        		query = new TermQuery(new Term(searchField, txtSearch.getText()));
+		        	}
+					Query filter = new TermQuery(new Term("best_new_music", "1"));
 			        
 			        BooleanQuery booleanQuery = new BooleanQuery.Builder()
 			            .add(query, BooleanClause.Occur.MUST)
@@ -539,7 +563,7 @@ public class MainMusicSearcher {
 			
 	        hits = docs.scoreDocs;
 	        
-	        
+	        btnPrevPage.setEnabled(false);
 	        if (hits.length > 10) {
 	        	btnNextPage.setEnabled(true);
 	        }
@@ -552,6 +576,9 @@ public class MainMusicSearcher {
 						"", "", "", "", "", "", "", "", ""
 					}
 			));
+			columnModel.getColumn(0).setPreferredWidth(5);
+			columnModel.getColumn(2).setPreferredWidth(150);
+			columnModel.getColumn(5).setPreferredWidth(5);
 	        
 	        // 4. display results
 	        System.out.println("Found " + hits.length + " hits.");
@@ -561,7 +588,6 @@ public class MainMusicSearcher {
 	        DecimalFormat numberFormat = new DecimalFormat("#.###");
 	        lblNewLabel.setText("About " + hits.length + " results (" + numberFormat.format((endTime - startTime)/1000000000f) + " seconds)");
 	        for(int i=result_counter[0];i < result_counter[1];++i) {
-	        	System.out.println(i);
 	        	if (i >= hits.length) {
 	        		btnNextPage.setEnabled(false);
 	        		break;
@@ -604,7 +630,7 @@ public class MainMusicSearcher {
 		String[] splited = text.split(" ");
 		
 		for(String i : splited) {
-			if (i.equals(wordOfInterest)) {
+			if (i.toLowerCase().equals(wordOfInterest.toLowerCase())) {
 				sb.append("<font color='red'> " + i + " </font>");
 			}else {
 				sb.append(" " + i + " ");
