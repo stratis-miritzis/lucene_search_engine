@@ -3,6 +3,7 @@
 #### Ευστράτιος Μυριτζής  ΑΜ:4444
 #### Δημήτριος Γιαννακόπουλος ΑΜ:4336
 
+https://youtu.be/K1kBfaEZDkI
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/K1kBfaEZDkI/0.jpg)](http://www.youtube.com/watch?v=K1kBfaEZDkI "Ανάκτηση Πληροφορίας Ευστράτιος Μυριτζής 4444, Δημήτρης Γιαννακόπουλος 4336")
 
 # Μηχανή Αναζήτησης Κριτικών Μουσικής
